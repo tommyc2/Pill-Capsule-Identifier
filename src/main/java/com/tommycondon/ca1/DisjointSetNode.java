@@ -7,6 +7,7 @@ public class DisjointSetNode<T> {
 
 	public DisjointSetNode(T data) {
 		this.data=data;
+
 	}
 
 	public DisjointSetNode<?> getParent() {
