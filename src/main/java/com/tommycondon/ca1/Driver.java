@@ -13,7 +13,9 @@ public class Driver extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Driver.class.getResource("gui.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        int width = 1200;
+        int height = 1080;
+        Scene scene = new Scene(fxmlLoader.load(), width, height);
         stage.setTitle("Pill and Capsule Analyser");
         stage.setScene(scene);
         stage.show();

@@ -1,41 +1,34 @@
 package com.tommycondon.ca1;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.event.ActionEvent;
-import javafx.scene.control.TextField;
 import javafx.scene.image.*;
-import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import java.io.File;
+import java.util.ArrayList;
 
 public class Controller {
-    public ImageView imageView;
-    public Image img;
+    public ImageView imageView = new ImageView();
+    public ImageView blackAndWhiteView = new ImageView();
 
-    public Slider sliderObj = new Slider(0,255,255);
-
-    public TextField saturationValue;
+    int[][] imageArray;// 2D array that stores each pixel in the image
 
     public void openImage(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(Driver.primaryStage);
-
         if(file != null){
             Image image = new Image(file.toURI().toString());
             imageView.setImage(image);
-            this.img = image;
+            imageArray = new int[(int) image.getWidth()][(int) image.getHeight()]; // 2D array to store pixel values
         }
-
-        sliderObj.setShowTickLabels(true);
-        sliderObj.setShowTickLabels(true);
-        sliderObj.setValue(255);
     }
 
-    public void setToGrayScale(ActionEvent actionEvent) {
+    public void blackAndWhiteConversion(MouseEvent actionEvent) {
         Image image = imageView.getImage();
+
+        // Colour of pixel at the mouse click point
+        Color colorOfClickedPixel = image.getPixelReader().getColor((int) actionEvent.getX(),(int) actionEvent.getY());
         PixelReader pixelReader = image.getPixelReader();
         WritableImage writableImage = new WritableImage((int) image.getWidth(), (int) image.getHeight());
         PixelWriter pixelWriter = writableImage.getPixelWriter();
@@ -45,50 +38,34 @@ public class Controller {
 
             for (int xcoord = 0; xcoord < image.getWidth(); xcoord++)
             {
-                Color color = pixelReader.getColor(xcoord, ycoord);
-                double averageValues = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
-                pixelWriter.setColor(xcoord, ycoord, new Color(averageValues, averageValues, averageValues, color.getOpacity()));
+                Color colorOfPixel = pixelReader.getColor(xcoord, ycoord);
+
+                if(areSimilar(colorOfPixel,colorOfClickedPixel)) {
+                    pixelWriter.setColor(xcoord,ycoord,Color.WHITE);
+                    imageArray[xcoord][ycoord] = 0; // white pixels = 0
+                }
+                else {
+                    pixelWriter.setColor(xcoord,ycoord,Color.BLACK);
+                    imageArray[xcoord][ycoord] = -1; // Black pixels = -1
+                }
+
             }
 
         }
 
-        imageView.setImage(writableImage); // Setting image to grayscale
+        blackAndWhiteView.setImage(writableImage); // Setting image to grayscale
     }
 
-    public void setToRGB(ActionEvent actionEvent) {
-        imageView.setImage(img);
+    /* Check if colour is similar to another pixel's colour */
+    public boolean areSimilar(Color color, Color color1){
+        boolean blue = (Math.abs(color.getBlue() - color1.getBlue()) <= 0.065);
+        boolean green = (Math.abs(color.getGreen() - color1.getGreen()) <= 0.065);
+        boolean red = (Math.abs(color.getRed() - color1.getRed()) <= 0.065);
+        boolean saturation = (Math.abs(color.getSaturation() - color1.getSaturation()) <= 0.065);
+        boolean brightness = (Math.abs(color.getBrightness()-color1.getBrightness()) <= 0.065);
+
+        return (red && blue && green && saturation && brightness);
     }
-
-    public void adjustOpacity(MouseEvent actionEvent) {
-
-        Image image = imageView.getImage();
-        PixelReader pixelReader = image.getPixelReader();
-        WritableImage writableImage = new WritableImage((int) image.getWidth(), (int) image.getHeight());
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-
-        for (int ycoord = 0; ycoord < image.getHeight(); ycoord++)
-        {
-
-            for (int xcoord = 0; xcoord < image.getWidth(); xcoord++)
-            {
-                Color color = pixelReader.getColor(xcoord, ycoord);
-                double opacity = sliderObj.valueProperty().getValue();
-                pixelWriter.setColor(xcoord, ycoord, new Color(color.getRed(), color.getGreen(), color.getBlue(), opacity));
-            }
-
-        }
-
-        imageView.setImage(writableImage);
-    }
-
-    public void submitSaturation(ActionEvent actionEvent) {
-        double sat = Double.parseDouble(saturationValue.getText());
-        double newSat = sat/100;
-        //saturationObj = new ColorAdjust();
-        //saturationObj.setSaturation(newSat);
-        //imageView.setEffect(saturationObj);
-    }
-
 
     public void redChannelEvent(ActionEvent actionEvent) {
         Image image = imageView.getImage();
