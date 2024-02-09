@@ -6,7 +6,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import java.io.File;
-import java.util.ArrayList;
 
 public class Controller {
     public ImageView imageView = new ImageView();
@@ -20,7 +19,7 @@ public class Controller {
         if(file != null){
             Image image = new Image(file.toURI().toString());
             imageView.setImage(image);
-            imageArray = new int[(int) image.getWidth()][(int) image.getHeight()]; // 2D array to store pixel values
+            this.imageArray = new int[(int) image.getWidth()][(int) image.getHeight()]; // 2D array to store pixel values
             System.out.println("Image Dimensions --> " + Utilities.getImageDimensions(imageView.getImage()));
         }
     }
@@ -55,6 +54,7 @@ public class Controller {
         }
 
         blackAndWhiteView.setImage(writableImage); // Setting image to grayscale
+        formPillsFromWhitePixels(writableImage,pixelReader,pixelWriter);
     }
 
     /* Check if colour is similar to another pixel's colour */
@@ -66,6 +66,16 @@ public class Controller {
         boolean brightness = (Math.abs(color.getBrightness()-color1.getBrightness()) <= 0.065);
 
         return (red && blue && green && saturation && brightness);
+    }
+
+    public void formPillsFromWhitePixels(Image image, PixelReader pixelReader, PixelWriter pixelWriter){
+        for (int y = 0; y < image.getHeight(); y++)
+        {
+            for (int x = 0; x < image.getWidth(); x++)
+            {
+                int indexOfPixel = imageArray[x][y];
+            }
+        }
     }
 
     public void redChannelEvent(ActionEvent actionEvent) {
