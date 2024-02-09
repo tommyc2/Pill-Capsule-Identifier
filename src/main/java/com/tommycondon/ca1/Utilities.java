@@ -13,8 +13,7 @@ public class Utilities {
     public static String getImageDimensions(Image image){
         double width = image.getWidth();
         double height = image.getHeight();
-        String dimensions = "Width: "+width + ", Height: "+height;
-        return dimensions;
+        return "Width: "+width + ", Height: "+height;
     }
 
     /**

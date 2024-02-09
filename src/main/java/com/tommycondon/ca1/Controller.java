@@ -21,6 +21,7 @@ public class Controller {
             Image image = new Image(file.toURI().toString());
             imageView.setImage(image);
             imageArray = new int[(int) image.getWidth()][(int) image.getHeight()]; // 2D array to store pixel values
+            System.out.println("Image Dimensions --> " + Utilities.getImageDimensions(imageView.getImage()));
         }
     }
 
