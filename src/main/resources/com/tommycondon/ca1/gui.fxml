@@ -13,7 +13,7 @@
    <top>
       <AnchorPane prefHeight="55.0" prefWidth="808.0" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="264.0" layoutY="14.0" text="Pill Finder Application" textAlignment="CENTER">
+            <Label layoutX="264.0" layoutY="14.0" text="Pill/Capsule Finder Application" textAlignment="CENTER">
                <font>
                   <Font size="30.0" />
                </font>
@@ -32,7 +32,7 @@
                            <font>
                               <Font size="24.0" />
                            </font></Button>
-                        <ImageView fx:id="imageView" fitHeight="718.0" fitWidth="716.0" layoutX="43.0" layoutY="65.0" onMouseClicked="#blackAndWhiteConversion" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="imageView" fitHeight="617.0" fitWidth="616.0" layoutX="43.0" layoutY="65.0" onMouseClicked="#blackAndWhiteConversion" pickOnBounds="true" preserveRatio="true" />
                      </children>
                   </AnchorPane>
             </content>
@@ -41,7 +41,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <ImageView fx:id="blackAndWhiteView" fitHeight="718.0" fitWidth="716.0" layoutX="34.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="blackAndWhiteView" fitHeight="617.0" fitWidth="616.0" layoutX="34.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
                      </children></AnchorPane>
             </content>
           </Tab>

@@ -5,13 +5,15 @@ import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+
 import java.io.File;
 
 public class Controller {
     public ImageView imageView = new ImageView();
     public ImageView blackAndWhiteView = new ImageView();
 
-    int[][] imageArray;// 2D array that stores each pixel in the image
+    public Image originalImageUploaded;
+    int[] imageArray;// array that stores each pixel in the unprocessed image
 
     public void openImage(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
@@ -19,7 +21,8 @@ public class Controller {
         if(file != null){
             Image image = new Image(file.toURI().toString());
             imageView.setImage(image);
-            this.imageArray = new int[(int) image.getWidth()][(int) image.getHeight()]; // 2D array to store pixel values
+            this.imageArray = new int[(int) image.getWidth()*(int) image.getHeight()];
+            this.originalImageUploaded = image; // For things like resetting black and white view etc.
             System.out.println("Image Dimensions --> " + Utilities.getImageDimensions(imageView.getImage()));
         }
     }
@@ -42,19 +45,49 @@ public class Controller {
 
                 if(areSimilar(colorOfPixel,colorOfClickedPixel)) {
                     pixelWriter.setColor(xcoord,ycoord,Color.WHITE);
-                    imageArray[xcoord][ycoord] = 0; // white pixels = 0
+                    imageArray[xcoord + (ycoord*(int)image.getWidth())] = 0; // white pixels = 0
                 }
                 else {
                     pixelWriter.setColor(xcoord,ycoord,Color.BLACK);
-                    imageArray[xcoord][ycoord] = -1; // Black pixels = -1
+                    imageArray[xcoord + (ycoord*(int)image.getWidth())] = -1; // Black pixels = -1
                 }
 
             }
 
         }
-
         blackAndWhiteView.setImage(writableImage); // Setting image to grayscale
-        formPillsFromWhitePixels(writableImage,pixelReader,pixelWriter);
+
+
+        // formation of pills using union and find
+        // image here refers to unprocessed Image
+        for (int y = 0; y < image.getHeight(); y++)
+        {
+            for (int x = 0; x < image.getWidth(); x++)
+            {
+                int indexOfPixel = (x + (y*(int)image.getWidth()));
+
+                if(imageArray[indexOfPixel] == 0) {
+                    // If equal to zero, check right + bottom and union them
+                    int currentPixel = imageArray[indexOfPixel];
+                    int rightIndex = (indexOfPixel+1);
+                    int belowIndex = (indexOfPixel+(int)image.getWidth());
+
+                    if(rightIndex < imageArray.length && imageArray[rightIndex] == 0){
+                        UnionAndFind.union(imageArray,currentPixel,imageArray[rightIndex]);
+                    }
+                    if(belowIndex < imageArray.length && imageArray[belowIndex] == 0){
+                        UnionAndFind.union(imageArray,currentPixel,imageArray[belowIndex]);
+                    }
+                }
+
+            }
+        }
+
+        drawRectangles();
+    }
+
+    private void drawRectangles() {
+        //TODO --> DrawRectangles
     }
 
     /* Check if colour is similar to another pixel's colour */
@@ -66,16 +99,6 @@ public class Controller {
         boolean brightness = (Math.abs(color.getBrightness()-color1.getBrightness()) <= 0.065);
 
         return (red && blue && green && saturation && brightness);
-    }
-
-    public void formPillsFromWhitePixels(Image image, PixelReader pixelReader, PixelWriter pixelWriter){
-        for (int y = 0; y < image.getHeight(); y++)
-        {
-            for (int x = 0; x < image.getWidth(); x++)
-            {
-                int indexOfPixel = imageArray[x][y];
-            }
-        }
     }
 
     public void redChannelEvent(ActionEvent actionEvent) {
@@ -123,7 +146,8 @@ public class Controller {
         imageView.setImage(writableImage);
     }
 
-    public void resetToDefaultSettings(ActionEvent actionEvent) {
+    public void resetToDefaultImage(ActionEvent actionEvent) {
         imageView.setEffect(null);
+        imageView.setImage(this.originalImageUploaded);
     }
 }
