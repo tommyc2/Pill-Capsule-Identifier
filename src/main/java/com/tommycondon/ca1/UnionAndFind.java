@@ -8,11 +8,15 @@ public class UnionAndFind {
 
     // Integer
     public static int find(int [] array, int id){
-        if(array[id]==id) return id;
-        else return find(array,array[id]);
+        if(array[id]==id) {
+            return id;
+        }
+        else {
+            return find(array,array[id]);
+        }
     }
 
-    // Object
+    // Object --> For DisjointSetNodes as integers maybe
     public static DisjointSetNode<?> find(DisjointSetNode<?> node){
         if(node.parent==null) return node;
         else return find(node.parent);
@@ -20,7 +24,7 @@ public class UnionAndFind {
 
     // Union both sets by making a node reference the root
     public static void union(int[] a, int p, int q){
-        a[find(a,q)]=p;
+        a[find(a,q)]=find(a,p);
     }
 
 }

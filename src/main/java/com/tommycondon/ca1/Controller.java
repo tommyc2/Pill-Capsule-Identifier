@@ -1,18 +1,19 @@
 package com.tommycondon.ca1;
-
 import javafx.event.ActionEvent;
+import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-
 import java.io.File;
+import java.util.Arrays;
 
 public class Controller {
     public ImageView imageView = new ImageView();
     public ImageView blackAndWhiteView = new ImageView();
 
     public Image originalImageUploaded;
+    public TextField descriptionOfPixel;
     int[] imageArray;// array that stores each pixel in the unprocessed image
 
     public void openImage(ActionEvent actionEvent) {
@@ -57,25 +58,24 @@ public class Controller {
         }
         blackAndWhiteView.setImage(writableImage); // Setting image to grayscale
 
-
         // formation of pills using union and find
         // image here refers to unprocessed Image
         for (int y = 0; y < image.getHeight(); y++)
         {
             for (int x = 0; x < image.getWidth(); x++)
             {
-                int indexOfPixel = (x + (y*(int)image.getWidth()));
+                int indexOfPixel = y * (int) image.getWidth() + x;
 
                 if(imageArray[indexOfPixel] == 0) {
                     // If equal to zero, check right + bottom and union them
                     int currentPixel = imageArray[indexOfPixel];
-                    int rightIndex = (indexOfPixel+1);
-                    int belowIndex = (indexOfPixel+(int)image.getWidth());
+                    int rightIndex = indexOfPixel+1;
+                    int belowIndex = indexOfPixel+((int)image.getWidth());
 
-                    if(rightIndex < imageArray.length && imageArray[rightIndex] == 0){
+                    if((rightIndex < imageArray.length) && (imageArray[rightIndex] != -1)){
                         UnionAndFind.union(imageArray,currentPixel,imageArray[rightIndex]);
                     }
-                    if(belowIndex < imageArray.length && imageArray[belowIndex] == 0){
+                    if((belowIndex < imageArray.length) && (imageArray[belowIndex] != -1)){
                         UnionAndFind.union(imageArray,currentPixel,imageArray[belowIndex]);
                     }
                 }
@@ -90,6 +90,12 @@ public class Controller {
         //TODO --> DrawRectangles
     }
 
+    private void displayImageArray(){
+        // Showing image array values
+        System.out.println(Arrays.toString(imageArray));
+    }
+
+
     /* Check if colour is similar to another pixel's colour */
     public boolean areSimilar(Color color, Color color1){
         boolean blue = (Math.abs(color.getBlue() - color1.getBlue()) <= 0.065);
@@ -99,51 +105,6 @@ public class Controller {
         boolean brightness = (Math.abs(color.getBrightness()-color1.getBrightness()) <= 0.065);
 
         return (red && blue && green && saturation && brightness);
-    }
-
-    public void redChannelEvent(ActionEvent actionEvent) {
-        Image image = imageView.getImage();
-        PixelReader pixelReader = image.getPixelReader();
-        WritableImage writableImage = new WritableImage((int) image.getWidth(), (int) image.getHeight());
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                Color pixel = pixelReader.getColor(x, y);
-                pixelWriter.setColor(x, y, new Color(pixel.getRed(), 0, 0, pixel.getOpacity()));
-            }
-        }
-        imageView.setImage(writableImage);
-    }
-
-    public void blueChannelEvent(ActionEvent actionEvent) {
-        Image image = imageView.getImage();
-        PixelReader pixelReader = image.getPixelReader();
-        WritableImage writableImage = new WritableImage((int) image.getWidth(), (int) image.getHeight());
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                Color pixel = pixelReader.getColor(x, y);
-                pixelWriter.setColor(x, y, new Color(0, 0, pixel.getBlue(), pixel.getOpacity()));
-            }
-        }
-        imageView.setImage(writableImage);
-    }
-
-    public void greenChannelEvent(ActionEvent actionEvent) {
-        Image image = imageView.getImage();
-        PixelReader pixelReader = image.getPixelReader();
-        WritableImage writableImage = new WritableImage((int) image.getWidth(), (int) image.getHeight());
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                Color pixel = pixelReader.getColor(x, y);
-                pixelWriter.setColor(x, y, new Color(0, pixel.getGreen(), 0, pixel.getOpacity()));
-            }
-        }
-        imageView.setImage(writableImage);
     }
 
     public void resetToDefaultImage(ActionEvent actionEvent) {
