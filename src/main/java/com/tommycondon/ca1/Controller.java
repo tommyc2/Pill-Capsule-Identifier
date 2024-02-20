@@ -6,14 +6,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import java.io.File;
-import java.util.Arrays;
+import java.util.HashSet;
 
 public class Controller {
     public ImageView imageView = new ImageView();
     public ImageView blackAndWhiteView = new ImageView();
-
     public Image originalImageUploaded;
     public TextField descriptionOfPixel;
+    public HashSet<Integer> roots = new HashSet<>();
     int[] imageArray;// array that stores each pixel in the unprocessed image
 
     public void openImage(ActionEvent actionEvent) {
@@ -46,7 +46,7 @@ public class Controller {
 
                 if(areSimilar(colorOfPixel,colorOfClickedPixel)) {
                     pixelWriter.setColor(xcoord,ycoord,Color.WHITE);
-                    imageArray[xcoord + (ycoord*(int)image.getWidth())] = 0; // white pixels = 0
+                    imageArray[xcoord + (ycoord*(int)image.getWidth())] = xcoord + (ycoord*(int)image.getWidth()); // white pixels = 0
                 }
                 else {
                     pixelWriter.setColor(xcoord,ycoord,Color.BLACK);
@@ -58,6 +58,7 @@ public class Controller {
         }
         blackAndWhiteView.setImage(writableImage); // Setting image to grayscale
 
+        //displayDSAsText(imageArray);
         // formation of pills using union and find
         // image here refers to unprocessed Image
         for (int y = 0; y < image.getHeight(); y++)
@@ -66,7 +67,7 @@ public class Controller {
             {
                 int indexOfPixel = y * (int) image.getWidth() + x;
 
-                if(imageArray[indexOfPixel] == 0) {
+                if(imageArray[indexOfPixel] >= 0) {
                     // If equal to zero, check right + bottom and union them
                     int currentPixel = imageArray[indexOfPixel];
                     int rightIndex = indexOfPixel+1;
@@ -82,17 +83,14 @@ public class Controller {
 
             }
         }
-
-        drawRectangles();
+        numberOfPills(imageArray);
+        System.out.println(sizeOfSelectedPill(imageArray,(int) actionEvent.getX(),(int) actionEvent.getY()) + "pixel units");
+        //displayDSAsText(imageArray);
+        //drawRectangles();
     }
 
     private void drawRectangles() {
         //TODO --> DrawRectangles
-    }
-
-    private void displayImageArray(){
-        // Showing image array values
-        System.out.println(Arrays.toString(imageArray));
     }
 
 
@@ -111,4 +109,31 @@ public class Controller {
         imageView.setEffect(null);
         imageView.setImage(this.originalImageUploaded);
     }
+
+    public void displayDSAsText(int[] ia){
+        //System.out.println("Number of pills selected: " + numberOfPills());
+        System.out.println("The DS Array\n--------------");
+        for(int i=0;i<ia.length;i++)
+            System.out.print(UnionAndFind.find(ia,i) + ((i+1)%imageView.getImage().getWidth()==0 ? "\n" : " "));
+    }
+
+    public void numberOfPills(int[] ia){
+        HashSet<Integer> diffValues = new HashSet<>();
+        for (int i = 0; i < ia.length; i++){
+            diffValues.add(UnionAndFind.find(ia,i));
+        }
+        this.roots = diffValues;
+        System.out.println("Number of pills selected: "+ (roots.size()-1)); // Excluding "-1" from hashset
+        // HashSet values are now the root values so can easily access them for later stages
+    }
+
+    public int sizeOfSelectedPill(int[] ia, int x, int y){
+        int indexOfPixel = y * (int) imageView.getImage().getWidth() + x;
+        int counter = 0;
+            for(int i = 0; i< ia.length; i++){
+                if(ia[i] == ia[indexOfPixel]) counter++;
+            }
+            return counter;
+        }
+
 }
