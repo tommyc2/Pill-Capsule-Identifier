@@ -4,6 +4,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import javafx.stage.FileChooser;
 import java.io.File;
 import java.util.HashSet;
@@ -46,7 +48,7 @@ public class Controller {
 
                 if(areSimilar(colorOfPixel,colorOfClickedPixel)) {
                     pixelWriter.setColor(xcoord,ycoord,Color.WHITE);
-                    imageArray[xcoord + (ycoord*(int)image.getWidth())] = xcoord + (ycoord*(int)image.getWidth()); // white pixels = 0
+                    imageArray[xcoord + (ycoord*(int)image.getWidth())] = xcoord + (ycoord*(int)image.getWidth());
                 }
                 else {
                     pixelWriter.setColor(xcoord,ycoord,Color.BLACK);
@@ -83,31 +85,75 @@ public class Controller {
 
             }
         }
-        numberOfPills(imageArray);
+
         System.out.println(sizeOfSelectedPill(imageArray,(int) actionEvent.getX(),(int) actionEvent.getY()) + "pixel units");
-        //displayDSAsText(imageArray);
-        //drawRectangles();
+
+        // Initialize HashSet with root Values
+
+        HashSet<Integer> diffValues = new HashSet<>();
+
+        for (int i = 0; i < imageArray.length; i++){
+            diffValues.add(UnionAndFind.find(imageArray,i));
+        }
+        this.roots = diffValues;
+
+
+        //////////////////////////////////////////////////
+
+        /* Mapping out Rectangle space */
+
+        int leftx = (int) image.getWidth();
+        int lefty = (int) image.getWidth();
+        int width = 50;
+        int height = 50;
+
+        for(int root : roots) {
+
+         for (int i = 0; i < imageArray.length; i++)
+         {
+             if (imageArray[i] != -1)
+             {
+                 int foundRoot = UnionAndFind.find(imageArray,i);
+
+                 if(foundRoot == root){
+
+                 }
+
+             }
+         }
+
+        }
+
+        drawRectangles(imageArray,width,height,leftx,lefty);
+
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+
     }
 
-    private void drawRectangles() {
-        //TODO --> DrawRectangles
+    private void drawRectangles(int[] ia,int width, int height, int topleftx, int toplefty) {
+        Rectangle rectangle = new Rectangle();
+        rectangle.setHeight(height);
+        rectangle.setWidth(width);
+        rectangle.setStroke(Color.DARKMAGENTA);
+        rectangle.setStrokeType(StrokeType.OUTSIDE);
+        rectangle.setStrokeWidth(4);
+        rectangle.setFill(Color.TRANSPARENT);
+
+
     }
 
 
     /* Check if colour is similar to another pixel's colour */
     public boolean areSimilar(Color color, Color color1){
-        boolean blue = (Math.abs(color.getBlue() - color1.getBlue()) <= 0.065);
-        boolean green = (Math.abs(color.getGreen() - color1.getGreen()) <= 0.065);
-        boolean red = (Math.abs(color.getRed() - color1.getRed()) <= 0.065);
-        boolean saturation = (Math.abs(color.getSaturation() - color1.getSaturation()) <= 0.065);
-        boolean brightness = (Math.abs(color.getBrightness()-color1.getBrightness()) <= 0.065);
-
-        return (red && blue && green && saturation && brightness);
-    }
-
-    public void resetToDefaultImage(ActionEvent actionEvent) {
-        imageView.setEffect(null);
-        imageView.setImage(this.originalImageUploaded);
+        boolean blue = (Math.abs(color.getBlue() - color1.getBlue()) <= 0.1);
+        boolean green = (Math.abs(color.getGreen() - color1.getGreen()) <= 0.1);
+        boolean red = (Math.abs(color.getRed() - color1.getRed()) <= 0.1);
+        boolean hue = (Math.abs(color.getHue() - color1.getHue()) < 0.1);
+        boolean sat = (Math.abs(color.getSaturation() - color1.getSaturation()) < 0.1);
+        boolean brightness = (Math.abs(color.getBrightness() - color1.getBrightness()) < 0.1);
+       // return (red && blue && green);
+        return sat && brightness && hue && green && red && blue;
     }
 
     public void displayDSAsText(int[] ia){
@@ -118,11 +164,6 @@ public class Controller {
     }
 
     public void numberOfPills(int[] ia){
-        HashSet<Integer> diffValues = new HashSet<>();
-        for (int i = 0; i < ia.length; i++){
-            diffValues.add(UnionAndFind.find(ia,i));
-        }
-        this.roots = diffValues;
         System.out.println("Number of pills selected: "+ (roots.size()-1)); // Excluding "-1" from hashset
         // HashSet values are now the root values so can easily access them for later stages
     }
@@ -130,8 +171,13 @@ public class Controller {
     public int sizeOfSelectedPill(int[] ia, int x, int y){
         int indexOfPixel = y * (int) imageView.getImage().getWidth() + x;
         int counter = 0;
-            for(int i = 0; i< ia.length; i++){
-                if(ia[i] == ia[indexOfPixel]) counter++;
+
+            for(int i = 0; i < ia.length; i++)
+            {
+                if(ia[i] == ia[indexOfPixel])
+                {
+                    counter++;
+                }
             }
             return counter;
         }

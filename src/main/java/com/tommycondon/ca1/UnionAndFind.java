@@ -7,8 +7,9 @@ public class UnionAndFind {
      */
 
     // Integer
-    public static int find(int [] array, int id){
+    public static int find(int[] array, int id){
         if(array[id]==-1) return -1;
+
         if(array[id]==id) {
             return id;
         }
