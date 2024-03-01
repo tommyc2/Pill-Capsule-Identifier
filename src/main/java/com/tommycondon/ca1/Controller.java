@@ -8,7 +8,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.FileChooser;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 public class Controller {
     public ImageView imageView = new ImageView();
@@ -102,10 +104,15 @@ public class Controller {
 
         /* Mapping out Rectangle space */
 
-        int leftx = (int) image.getWidth();
-        int lefty = (int) image.getWidth();
+        int leftx = 0;
+        int lefty = 0;
         int width = 50;
         int height = 50;
+
+        LinkedList<XYPoint> points = new LinkedList<>(); // storing x,y coords
+        HashSet<Integer> tempRoots = new HashSet<>(); // Create a temporary list to check if root is already given rectangle
+        LinkedList<Rectangle> rectanglesList = new LinkedList<>();
+
 
         for(int root : roots) {
 
@@ -115,32 +122,41 @@ public class Controller {
              {
                  int foundRoot = UnionAndFind.find(imageArray,i);
 
-                 if(foundRoot == root){
+                 if(foundRoot == root && !tempRoots.contains(root)){
+                     /* Source: https://stackoverflow.com/questions/47951361/finding-x-y-based-off-of-index
+                     * Converting index to X & Y coords
+                     * */
+                     leftx = i % (int) image.getWidth();
+                     lefty = i / (int) image.getWidth();
 
+                     XYPoint point = new XYPoint(leftx,lefty);
+                     points.add(point);
+
+                     tempRoots.add(root);
+
+                     Rectangle rectangle = new Rectangle(leftx,lefty,width,height);
+                     drawRectangles(width,height,leftx,lefty,point,rectangle,rectanglesList);
                  }
 
              }
+
          }
 
         }
-
-        drawRectangles(imageArray,width,height,leftx,lefty);
 
         //////////////////////////////////////////////////
         //////////////////////////////////////////////////
 
     }
 
-    private void drawRectangles(int[] ia,int width, int height, int topleftx, int toplefty) {
-        Rectangle rectangle = new Rectangle();
-        rectangle.setHeight(height);
-        rectangle.setWidth(width);
-        rectangle.setStroke(Color.DARKMAGENTA);
-        rectangle.setStrokeType(StrokeType.OUTSIDE);
-        rectangle.setStrokeWidth(4);
-        rectangle.setFill(Color.TRANSPARENT);
+    private void drawRectangles(int width, int height, int topleftx, int toplefty, XYPoint point, Rectangle rect, LinkedList<Rectangle> rectanglesList) {
+        rect.setStroke(Color.DARKMAGENTA);
+        rect.setStrokeType(StrokeType.OUTSIDE);
+        rect.setStrokeWidth(4);
+        rect.setFill(Color.TRANSPARENT);
 
-
+        rectanglesList.add(rect);
+        System.out.print("Added: " + rect.toString());
     }
 
 
