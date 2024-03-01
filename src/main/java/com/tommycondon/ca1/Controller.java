@@ -3,6 +3,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
@@ -33,6 +34,10 @@ public class Controller {
     }
 
     public void blackAndWhiteConversion(MouseEvent actionEvent) {
+        // clear rectangles before next selection
+        AnchorPane anchorPane = (AnchorPane) imageView.getParent();
+        anchorPane.getChildren().removeIf(component -> component instanceof Rectangle);
+
         Image image = imageView.getImage();
 
         // Colour of pixel at the mouse click point
@@ -106,8 +111,8 @@ public class Controller {
 
         int leftx = 0;
         int lefty = 0;
-        int width = 50;
-        int height = 50;
+        int width = 100;
+        int height = 65;
 
         LinkedList<XYPoint> points = new LinkedList<>(); // storing x,y coords
         HashSet<Integer> tempRoots = new HashSet<>(); // Create a temporary list to check if root is already given rectangle
@@ -126,7 +131,7 @@ public class Controller {
                      /* Source: https://stackoverflow.com/questions/47951361/finding-x-y-based-off-of-index
                      * Converting index to X & Y coords
                      * */
-                     leftx = i % (int) image.getWidth();
+                     leftx = i % (int) image.getWidth()-40;
                      lefty = i / (int) image.getWidth();
 
                      XYPoint point = new XYPoint(leftx,lefty);
@@ -135,7 +140,7 @@ public class Controller {
                      tempRoots.add(root);
 
                      Rectangle rectangle = new Rectangle(leftx,lefty,width,height);
-                     drawRectangles(width,height,leftx,lefty,point,rectangle,rectanglesList);
+                     drawRectangles(rectangle,rectanglesList);
                  }
 
              }
@@ -149,14 +154,22 @@ public class Controller {
 
     }
 
-    private void drawRectangles(int width, int height, int topleftx, int toplefty, XYPoint point, Rectangle rect, LinkedList<Rectangle> rectanglesList) {
+    private void drawRectangles(Rectangle rect, LinkedList<Rectangle> rectanglesList) {
+        rect.setLayoutX(imageView.getLayoutX());
+        rect.setLayoutY(imageView.getLayoutY());
         rect.setStroke(Color.DARKMAGENTA);
-        rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(4);
         rect.setFill(Color.TRANSPARENT);
 
         rectanglesList.add(rect);
-        System.out.print("Added: " + rect.toString());
+        System.out.print("Added rectangle at [" + (int)rect.getX() + ", " + (int)rect.getY() + "]"+ "\n");
+
+        // adding to anchor pane view
+        AnchorPane ap = (AnchorPane) imageView.getParent();
+        ap.getChildren().add(rect);
+        // temp solution for size of selected pills
+        System.out.println("Size of selected pill: " + (rectanglesList.get(0).getWidth()*rectanglesList.get(0).getHeight()) +" pixels");
+
     }
 
 
@@ -172,7 +185,7 @@ public class Controller {
         return sat && brightness && hue && green && red && blue;
     }
 
-    public void displayDSAsText(int[] ia){
+    public void displayImageArrayAsText(int[] ia){
         //System.out.println("Number of pills selected: " + numberOfPills());
         System.out.println("The DS Array\n--------------");
         for(int i=0;i<ia.length;i++)
