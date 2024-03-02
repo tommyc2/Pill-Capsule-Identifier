@@ -1,0 +1,2 @@
+- Size of pills wrong
+- Labels not in ordered fashion from top to bottom

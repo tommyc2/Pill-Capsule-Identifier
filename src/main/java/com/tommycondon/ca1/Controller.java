@@ -1,5 +1,6 @@
 package com.tommycondon.ca1;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
@@ -7,9 +8,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -37,6 +40,8 @@ public class Controller {
         // clear rectangles before next selection
         AnchorPane anchorPane = (AnchorPane) imageView.getParent();
         anchorPane.getChildren().removeIf(component -> component instanceof Rectangle);
+        anchorPane.getChildren().removeIf(component -> component instanceof Label);
+        anchorPane.getChildren().removeIf(component -> component instanceof Text);
 
         Image image = imageView.getImage();
 
@@ -115,7 +120,7 @@ public class Controller {
         int height = 65;
 
         LinkedList<XYPoint> points = new LinkedList<>(); // storing x,y coords
-        HashSet<Integer> tempRoots = new HashSet<>(); // Create a temporary list to check if root is already given rectangle
+        LinkedList<Integer> tempRoots = new LinkedList<>(); // Create a temporary list to check if root is already given rectangle
         LinkedList<Rectangle> rectanglesList = new LinkedList<>();
 
 
@@ -149,6 +154,20 @@ public class Controller {
 
         }
 
+        // Create label above pill, ordered fashion e.g. from top to bottom 1,2,3,4 etc
+        Collections.sort(tempRoots);
+
+        System.out.println("Temp Roots:" + tempRoots);
+        int id = 1;
+        while(id <= tempRoots.size()){
+            String stringMessage = "Pill " + id;
+            Label label = new Label(stringMessage);
+            label.setLayoutX(rectanglesList.get(id-1).getX());
+            label.setLayoutY(rectanglesList.get(id-1).getY());
+            ((AnchorPane) imageView.getParent()).getChildren().add(label);
+            id++;
+        }
+
         //////////////////////////////////////////////////
         //////////////////////////////////////////////////
 
@@ -162,13 +181,14 @@ public class Controller {
         rect.setFill(Color.TRANSPARENT);
 
         rectanglesList.add(rect);
+
         System.out.print("Added rectangle at [" + (int)rect.getX() + ", " + (int)rect.getY() + "]"+ "\n");
 
         // adding to anchor pane view
         AnchorPane ap = (AnchorPane) imageView.getParent();
         ap.getChildren().add(rect);
         // temp solution for size of selected pills
-        System.out.println("Size of selected pill: " + (rectanglesList.get(0).getWidth()*rectanglesList.get(0).getHeight()) +" pixels");
+        //System.out.println("Size of selected pill: " + (rectanglesList.get(0).getWidth()*rectanglesList.get(0).getHeight()) +" pixels");
 
     }
 
@@ -193,7 +213,7 @@ public class Controller {
     }
 
     public void numberOfPills(int[] ia){
-        System.out.println("Number of pills selected: "+ (roots.size()-1)); // Excluding "-1" from hashset
+        System.out.println("Number of pills: "+ (roots.size()-1)); // Excluding "-1" from hashset
         // HashSet values are now the root values so can easily access them for later stages
     }
 
@@ -211,4 +231,7 @@ public class Controller {
             return counter;
         }
 
+
 }
+
+
