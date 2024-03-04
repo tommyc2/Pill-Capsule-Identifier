@@ -7,11 +7,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -173,7 +171,7 @@ public class Controller {
 
     }
 
-    private void drawRectangles(Rectangle rect, LinkedList<Rectangle> rectanglesList) {
+    public void drawRectangles(Rectangle rect, LinkedList<Rectangle> rectanglesList) {
         rect.setLayoutX(imageView.getLayoutX());
         rect.setLayoutY(imageView.getLayoutY());
         rect.setStroke(Color.DARKMAGENTA);
@@ -212,8 +210,9 @@ public class Controller {
             System.out.print(UnionAndFind.find(ia,i) + ((i+1)%imageView.getImage().getWidth()==0 ? "\n" : " "));
     }
 
-    public void numberOfPills(int[] ia){
+    public int numberOfPills(){
         System.out.println("Number of pills: "+ (roots.size()-1)); // Excluding "-1" from hashset
+        return (roots.size()-1);
         // HashSet values are now the root values so can easily access them for later stages
     }
 
