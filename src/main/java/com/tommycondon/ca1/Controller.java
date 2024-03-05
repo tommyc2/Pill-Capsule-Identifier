@@ -1,7 +1,6 @@
 package com.tommycondon.ca1;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -10,6 +9,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,7 +20,11 @@ public class Controller {
     public Image originalImageUploaded;
     public TextField descriptionOfPixel;
     public HashSet<Integer> roots = new HashSet<>();
+    public TextField numSelected;
     int[] imageArray;// array that stores each pixel in the unprocessed image
+    public ListView<Pill> listView = new ListView();
+    public ArrayList<Pill> pills = new ArrayList<>();
+    //public Slider noiseSliderObj = new Slider();
 
     public void openImage(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
@@ -31,6 +35,8 @@ public class Controller {
             this.imageArray = new int[(int) image.getWidth()*(int) image.getHeight()];
             this.originalImageUploaded = image; // For things like resetting black and white view etc.
             System.out.println("Image Dimensions --> " + Utilities.getImageDimensions(imageView.getImage()));
+            //noiseSliderObj.setShowTickLabels(true);
+            //noiseSliderObj.setShowTickMarks(true);
         }
     }
 
@@ -96,7 +102,7 @@ public class Controller {
             }
         }
 
-        System.out.println(sizeOfSelectedPill(imageArray,(int) actionEvent.getX(),(int) actionEvent.getY()) + "pixel units");
+        //System.out.println(sizeOfSelectedPill(imageArray,(int) actionEvent.getX(),(int) actionEvent.getY()) + "pixel units");
 
         // Initialize HashSet with root Values
 
@@ -138,12 +144,14 @@ public class Controller {
                      lefty = i / (int) image.getWidth();
 
                      XYPoint point = new XYPoint(leftx,lefty);
-                     points.add(point);
 
+                     points.add(point);
                      tempRoots.add(root);
 
                      Rectangle rectangle = new Rectangle(leftx,lefty,width,height);
                      drawRectangles(rectangle,rectanglesList);
+                     double area = width*height;
+                     addPill(area,point,root,rectangle);
                  }
 
              }
@@ -154,28 +162,38 @@ public class Controller {
 
         // Create label above pill, ordered fashion e.g. from top to bottom 1,2,3,4 etc
         Collections.sort(tempRoots);
-
+        String num = ""+rectanglesList.size();
+        numSelected.setPromptText(num);
         System.out.println("Temp Roots:" + tempRoots);
-        int id = 1;
-        while(id <= tempRoots.size()){
-            String stringMessage = "Pill " + id;
-            Label label = new Label(stringMessage);
-            label.setLayoutX(rectanglesList.get(id-1).getX());
-            label.setLayoutY(rectanglesList.get(id-1).getY());
-            ((AnchorPane) imageView.getParent()).getChildren().add(label);
+        onscreenLabelling(tempRoots,rectanglesList);
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+
+    }
+
+    private boolean addPill(double area, XYPoint point, int root, Rectangle rectangle) {
+        Pill newPill = new Pill(area,point,root,rectangle);
+        listView.getItems().add(newPill);
+        return pills.add(newPill);
+    }
+
+    private void onscreenLabelling(LinkedList<Integer> tempRoots, LinkedList<Rectangle> rectanglesList) {
+        int id = 0;
+        while(id < tempRoots.size()){
+            Tooltip tooltip = new Tooltip("Pill");
+            tooltip.setText("Pill" + id +"\n"+
+                    "Size of selected pill: "+(rectanglesList.get(id).getWidth() * rectanglesList.get(id).getHeight())+"\n"
+            );
+            Tooltip.install(rectanglesList.get(id), tooltip);
             id++;
         }
-
-        //////////////////////////////////////////////////
-        //////////////////////////////////////////////////
-
     }
 
     public void drawRectangles(Rectangle rect, LinkedList<Rectangle> rectanglesList) {
         rect.setLayoutX(imageView.getLayoutX());
         rect.setLayoutY(imageView.getLayoutY());
         rect.setStroke(Color.DARKMAGENTA);
-        rect.setStrokeWidth(4);
+        rect.setStrokeWidth(3);
         rect.setFill(Color.TRANSPARENT);
 
         rectanglesList.add(rect);
@@ -216,7 +234,7 @@ public class Controller {
         // HashSet values are now the root values so can easily access them for later stages
     }
 
-    public int sizeOfSelectedPill(int[] ia, int x, int y){
+    /*public int sizeOfSelectedPill(int[] ia, int x, int y){
         int indexOfPixel = y * (int) imageView.getImage().getWidth() + x;
         int counter = 0;
 
@@ -228,6 +246,10 @@ public class Controller {
                 }
             }
             return counter;
+        }
+*/
+        public double adjustNoiseSliderValue(){
+        return -1;
         }
 
 

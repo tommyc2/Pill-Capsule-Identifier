@@ -1,6 +1,4 @@
 - Labels not in ordered fashion from top to bottom
 - Selection of multiple pills different colours
 - Number of pills selected (onscreen) (5%)
-- More tests/benchmarks (6%)
-- Tooltip
 - Noise management (8%)
