@@ -11,12 +11,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import static org.junit.jupiter.api.Assertions.*;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.control.TextField.*;
 
 public class ControllerTest {
 
     private Controller controllerObj = new Controller();
     private ImageView imageView = new ImageView();
-
     private LinkedList<Rectangle> rectangles = new LinkedList<>();
 
     @BeforeEach
@@ -42,8 +43,8 @@ public class ControllerTest {
         Rectangle rectangle = new Rectangle(50,50,50,50);
         rectangles.add(rectangle);
         assertTrue(rectangles.contains(rectangle));
-        assertTrue(rectangles.getFirst().x == 50);
-        assertTrue(rectangles.getFirst().y == 50);
+        assertTrue(rectangles.getFirst().getX() == 50);
+        assertTrue(rectangles.getFirst().getY() == 50);
     }
 
   @Test

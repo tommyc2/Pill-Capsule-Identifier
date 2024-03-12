@@ -1,6 +1,7 @@
 package com.tommycondon.ca1;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -18,13 +19,15 @@ public class Controller {
     public ImageView imageView = new ImageView();
     public ImageView blackAndWhiteView = new ImageView();
     public Image originalImageUploaded;
-    public TextField descriptionOfPixel;
     public HashSet<Integer> roots = new HashSet<>();
     public TextField numSelected;
+    public TextField hueSlider = new TextField();
+    public ImageView colorView = new ImageView();
+    public TextField noiseAdjust = new TextField();
+    public ColorAdjust colorAdjust = new ColorAdjust();
     int[] imageArray;// array that stores each pixel in the unprocessed image
     public ListView<Pill> listView = new ListView();
     public ArrayList<Pill> pills = new ArrayList<>();
-    //public Slider noiseSliderObj = new Slider();
 
     public void openImage(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
@@ -40,7 +43,17 @@ public class Controller {
         }
     }
 
+    public int numberOfOccurencesOfoot(int root){
+        int counter = 0;
+        for(int val : imageArray){
+            if (val==root) counter++;
+        }
+        return counter;
+    }
+
     public void blackAndWhiteConversion(MouseEvent actionEvent) {
+        listView.getItems().clear();
+
         // clear rectangles before next selection
         AnchorPane anchorPane = (AnchorPane) imageView.getParent();
         anchorPane.getChildren().removeIf(component -> component instanceof Rectangle);
@@ -52,7 +65,11 @@ public class Controller {
         // Colour of pixel at the mouse click point
         Color colorOfClickedPixel = image.getPixelReader().getColor((int) actionEvent.getX(),(int) actionEvent.getY());
         PixelReader pixelReader = image.getPixelReader();
+
         WritableImage writableImage = new WritableImage((int) image.getWidth(), (int) image.getHeight());
+        WritableImage colorWritable = new WritableImage((int) image.getWidth(), (int) image.getHeight());
+
+        PixelWriter pixelWriterColor = colorWritable.getPixelWriter();
         PixelWriter pixelWriter = writableImage.getPixelWriter();
 
         for (int ycoord = 0; ycoord < image.getHeight(); ycoord++)
@@ -64,17 +81,20 @@ public class Controller {
 
                 if(areSimilar(colorOfPixel,colorOfClickedPixel)) {
                     pixelWriter.setColor(xcoord,ycoord,Color.WHITE);
+                    pixelWriterColor.setColor(xcoord,ycoord,colorOfClickedPixel);
                     imageArray[xcoord + (ycoord*(int)image.getWidth())] = xcoord + (ycoord*(int)image.getWidth());
                 }
                 else {
                     pixelWriter.setColor(xcoord,ycoord,Color.BLACK);
+                    pixelWriterColor.setColor(xcoord,ycoord,Color.BLACK);
                     imageArray[xcoord + (ycoord*(int)image.getWidth())] = -1; // Black pixels = -1
                 }
 
             }
 
         }
-        blackAndWhiteView.setImage(writableImage); // Setting image to grayscale
+        blackAndWhiteView.setImage(writableImage);
+        colorView.setImage(colorWritable);
 
         //displayDSAsText(imageArray);
         // formation of pills using union and find
@@ -102,8 +122,6 @@ public class Controller {
             }
         }
 
-        //System.out.println(sizeOfSelectedPill(imageArray,(int) actionEvent.getX(),(int) actionEvent.getY()) + "pixel units");
-
         // Initialize HashSet with root Values
 
         HashSet<Integer> diffValues = new HashSet<>();
@@ -112,7 +130,6 @@ public class Controller {
             diffValues.add(UnionAndFind.find(imageArray,i));
         }
         this.roots = diffValues;
-
 
         //////////////////////////////////////////////////
 
@@ -151,6 +168,7 @@ public class Controller {
                      Rectangle rectangle = new Rectangle(leftx,lefty,width,height);
                      drawRectangles(rectangle,rectanglesList);
                      double area = width*height;
+                     System.out.println("Area of pill: " + area);
                      addPill(area,point,root,rectangle);
                  }
 
@@ -161,20 +179,23 @@ public class Controller {
         }
 
         // Create label above pill, ordered fashion e.g. from top to bottom 1,2,3,4 etc
-        Collections.sort(tempRoots);
+        //Collections.sort(tempRoots);
         String num = ""+rectanglesList.size();
         numSelected.setPromptText(num);
         System.out.println("Temp Roots:" + tempRoots);
         onscreenLabelling(tempRoots,rectanglesList);
+        for(int value : tempRoots){
+            System.out.println("Size of (" + value + "): "+ numberOfOccurencesOfoot(value) + "Pixels" + "\n");
+        }
         //////////////////////////////////////////////////
         //////////////////////////////////////////////////
 
     }
 
-    private boolean addPill(double area, XYPoint point, int root, Rectangle rectangle) {
-        Pill newPill = new Pill(area,point,root,rectangle);
-        listView.getItems().add(newPill);
-        return pills.add(newPill);
+    public boolean addPill(double area, XYPoint point, int rootval, Rectangle rectangle) {
+        Pill newPill = new Pill(area,point,rootval,rectangle);
+            listView.getItems().add(newPill);
+            return pills.add(newPill);
     }
 
     private void onscreenLabelling(LinkedList<Integer> tempRoots, LinkedList<Rectangle> rectanglesList) {
@@ -182,7 +203,7 @@ public class Controller {
         while(id < tempRoots.size()){
             Tooltip tooltip = new Tooltip("Pill");
             tooltip.setText("Pill" + id +"\n"+
-                    "Size of selected pill: "+(rectanglesList.get(id).getWidth() * rectanglesList.get(id).getHeight())+"\n"
+                    "Size of pill: "+numberOfOccurencesOfoot(tempRoots.get(id))+ " pixel units" + "\n"
             );
             Tooltip.install(rectanglesList.get(id), tooltip);
             id++;
@@ -234,25 +255,22 @@ public class Controller {
         // HashSet values are now the root values so can easily access them for later stages
     }
 
-    /*public int sizeOfSelectedPill(int[] ia, int x, int y){
-        int indexOfPixel = y * (int) imageView.getImage().getWidth() + x;
-        int counter = 0;
 
-            for(int i = 0; i < ia.length; i++)
-            {
-                if(ia[i] == ia[indexOfPixel])
-                {
-                    counter++;
-                }
-            }
-            return counter;
-        }
-*/
-        public double adjustNoiseSliderValue(){
-        return -1;
-        }
+    public void changeHue(ActionEvent mouseEvent) {
+            double hueVal = Double.parseDouble(hueSlider.getText());
+            colorAdjust.setHue(hueVal);
+            imageView.setEffect(colorAdjust);
+    }
 
-
+    public void reset(){
+        listView.getItems().removeAll(pills);
+        numSelected.setPromptText(String.valueOf(0));
+        AnchorPane anchorPane = (AnchorPane) imageView.getParent();
+        anchorPane.getChildren().removeIf(component -> component instanceof Rectangle);
+        anchorPane.getChildren().removeIf(component -> component instanceof Label);
+        anchorPane.getChildren().removeIf(component -> component instanceof Text);
+        imageView.setEffect(null);
+    }
 }
 
 

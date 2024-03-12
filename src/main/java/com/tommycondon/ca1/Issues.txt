@@ -1,4 +1,0 @@
-- Labels not in ordered fashion from top to bottom
-- Selection of multiple pills different colours
-- Number of pills selected (onscreen) (5%)
-- Noise management (8%)

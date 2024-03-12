@@ -16,8 +16,38 @@ public class Pill {
     }
 
     public String toString(){
-        return "Pill --> Area of pill: " + area + ", " + "Root Value: " + rootValue + ", ";
+        return "Pill --> " + "Root Value: " + rootValue + ", ";
     }
 
+    public double getArea() {
+        return area;
+    }
 
+    public void setArea(double area) {
+        this.area = area;
+    }
+
+    public XYPoint getPoint() {
+        return point;
+    }
+
+    public void setPoint(XYPoint point) {
+        this.point = point;
+    }
+
+    public int getRootValue() {
+        return rootValue;
+    }
+
+    public void setRootValue(int rootValue) {
+        this.rootValue = rootValue;
+    }
+
+    public Rectangle getRectangle() {
+        return rectangle;
+    }
+
+    public void setRectangle(Rectangle rectangle) {
+        this.rectangle = rectangle;
+    }
 }
