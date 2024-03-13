@@ -170,7 +170,6 @@ public class Controller {
                         double area = width*height;
                         System.out.println("Area of pill: " + area);
                         addPill(area,point,root,rectangle);
-                        ((AnchorPane) imageView.getParent()).getChildren().add(new Text("Pill " + (tempRoots.size())));
                     }
 
                 }
