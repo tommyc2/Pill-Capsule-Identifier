@@ -140,46 +140,48 @@ public class Controller {
         int width = 100;
         int height = 65;
 
-        LinkedList<XYPoint> points = new LinkedList<>(); // storing x,y coords
+        ArrayList<XYPoint> points = new ArrayList<>(); // storing x,y coords
         LinkedList<Integer> tempRoots = new LinkedList<>(); // Create a temporary list to check if root is already given rectangle
         LinkedList<Rectangle> rectanglesList = new LinkedList<>();
 
 
         for(int root : roots) {
 
-         for (int i = 0; i < imageArray.length; i++)
-         {
-             if (imageArray[i] != -1)
-             {
-                 int foundRoot = UnionAndFind.find(imageArray,i);
+            for (int i = 0; i < imageArray.length; i++)
+            {
+                if (imageArray[i] != -1)
+                {
+                    int foundRoot = UnionAndFind.find(imageArray,i);
 
-                 if(foundRoot == root && !tempRoots.contains(root)){
-                     /* Source: https://stackoverflow.com/questions/47951361/finding-x-y-based-off-of-index
-                     * Converting index to X & Y coords
-                     * */
-                     leftx = i % (int) image.getWidth()-40;
-                     lefty = i / (int) image.getWidth();
+                    if(foundRoot == root && !tempRoots.contains(root)){
+                        /* Source: https://stackoverflow.com/questions/47951361/finding-x-y-based-off-of-index
+                         * Converting index to X & Y coords
+                         * */
+                        leftx = i % (int) image.getWidth()-40;
+                        lefty = i / (int) image.getWidth();
 
-                     XYPoint point = new XYPoint(leftx,lefty);
+                        XYPoint point = new XYPoint(leftx,lefty);
 
-                     points.add(point);
-                     tempRoots.add(root);
+                        points.add(point);
+                        tempRoots.add(root);
 
-                     Rectangle rectangle = new Rectangle(leftx,lefty,width,height);
-                     drawRectangles(rectangle,rectanglesList);
-                     double area = width*height;
-                     System.out.println("Area of pill: " + area);
-                     addPill(area,point,root,rectangle);
-                 }
+                        Rectangle rectangle = new Rectangle(leftx,lefty,width,height);
+                        drawRectangles(rectangle,rectanglesList);
+                        double area = width*height;
+                        System.out.println("Area of pill: " + area);
+                        addPill(area,point,root,rectangle);
+                        ((AnchorPane) imageView.getParent()).getChildren().add(new Text("Pill " + (tempRoots.size())));
+                    }
 
-             }
+                }
 
-         }
+            }
 
         }
 
         // Create label above pill, ordered fashion e.g. from top to bottom 1,2,3,4 etc
         //Collections.sort(tempRoots);
+
         String num = ""+rectanglesList.size();
         numSelected.setPromptText(num);
         System.out.println("Temp Roots:" + tempRoots);
@@ -194,8 +196,8 @@ public class Controller {
 
     public boolean addPill(double area, XYPoint point, int rootval, Rectangle rectangle) {
         Pill newPill = new Pill(area,point,rootval,rectangle);
-            listView.getItems().add(newPill);
-            return pills.add(newPill);
+        listView.getItems().add(newPill);
+        return pills.add(newPill);
     }
 
     private void onscreenLabelling(LinkedList<Integer> tempRoots, LinkedList<Rectangle> rectanglesList) {
@@ -238,7 +240,7 @@ public class Controller {
         boolean hue = (Math.abs(color.getHue() - color1.getHue()) < 0.1);
         boolean sat = (Math.abs(color.getSaturation() - color1.getSaturation()) < 0.1);
         boolean brightness = (Math.abs(color.getBrightness() - color1.getBrightness()) < 0.1);
-       // return (red && blue && green);
+        // return (red && blue && green);
         return sat && brightness && hue && green && red && blue;
     }
 
@@ -257,9 +259,9 @@ public class Controller {
 
 
     public void changeHue(ActionEvent mouseEvent) {
-            double hueVal = Double.parseDouble(hueSlider.getText());
-            colorAdjust.setHue(hueVal);
-            imageView.setEffect(colorAdjust);
+        double hueVal = Double.parseDouble(hueSlider.getText());
+        colorAdjust.setHue(hueVal);
+        imageView.setEffect(colorAdjust);
     }
 
     public void reset(){
@@ -271,6 +273,11 @@ public class Controller {
         anchorPane.getChildren().removeIf(component -> component instanceof Text);
         imageView.setEffect(null);
     }
-}
 
+    private boolean checkTwoTone(Color colorOfPixel) {
+        boolean twotone1 = colorOfPixel.getRed()==1.0 && colorOfPixel.getGreen()==0.5137255191802979 && colorOfPixel.getBlue()==0.0;
+        boolean twotone2 = colorOfPixel.getRed()==0.0941176488995552 && colorOfPixel.getGreen()==0.0941176488995552 && colorOfPixel.getBlue()==0.0941176488995552;
+        return twotone2 || twotone1;
+    }
+}
 

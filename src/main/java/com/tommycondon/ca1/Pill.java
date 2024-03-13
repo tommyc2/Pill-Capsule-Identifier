@@ -16,7 +16,7 @@ public class Pill {
     }
 
     public String toString(){
-        return "Pill --> " + "Root Value: " + rootValue + ", ";
+        return "Pill --> [" + point.getX()+ "," + point.getY() + "] " + "Root Value: " + rootValue + ", ";
     }
 
     public double getArea() {
